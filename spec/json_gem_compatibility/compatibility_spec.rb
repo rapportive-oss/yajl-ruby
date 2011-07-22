@@ -79,6 +79,14 @@ describe "JSON Gem compatability API" do
     }.should raise_error(JSON::GeneratorError)
   end
 
+  it "should be a function that stringifies" do
+    JSON(:a => :b).should == {:a => :b}.to_json
+  end
+
+  it "should be a function that parses" do
+    JSON('{"a":"b"}').should == {'a' => 'b'}
+  end
+
   context "ported tests for Unicode" do
     it "should be able to encode and parse unicode" do
       '""'.should eql(''.to_json)
