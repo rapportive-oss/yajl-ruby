@@ -33,7 +33,7 @@
  return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
 
 /* Helpers for building objects */
-inline void yajl_check_and_fire_callback(void * ctx) {
+static void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
 
@@ -54,7 +54,7 @@ inline void yajl_check_and_fire_callback(void * ctx) {
     }
 }
 
-inline void yajl_set_static_value(void * ctx, VALUE val) {
+static void yajl_set_static_value(void * ctx, VALUE val) {
     yajl_parser_wrapper * wrapper;
     VALUE lastEntry, hash;
     int len;
@@ -187,11 +187,13 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         default:
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
+                Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
                 status = yajl_gen_number(w->encoder, cptr, len);
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
+                Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
                 status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, len);
@@ -286,7 +288,12 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
         char buf[stringLen+1];
         memcpy(buf, stringVal, stringLen);
         buf[stringLen] = 0;
-        yajl_set_static_value(ctx, ID2SYM(rb_intern(buf)));
+        VALUE stringEncoded = rb_str_new2(buf);
+#ifdef HAVE_RUBY_ENCODING_H
+        rb_enc_associate(stringEncoded, rb_utf8_encoding());
+#endif
+
+        yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H

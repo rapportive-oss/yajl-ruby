@@ -7,6 +7,18 @@ class Dummy2
   end
 end
 
+class TheMindKiller
+  def to_json
+    nil
+  end
+end
+
+class TheMindKillerDuce
+  def to_s
+    nil
+  end
+end
+
 describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
 
@@ -243,5 +255,20 @@ describe "Yajl JSON encoder" do
   it "should default to *not* escaping / characters" do
     unsafe_encoder = Yajl::Encoder.new
     unsafe_encoder.encode("</script>").should_not eql("\"<\\/script>\"")
+  end
+
+  it "return value of #to_json must be a string" do
+    lambda {
+      Yajl::Encoder.encode(TheMindKiller.new)
+    }.should raise_error(TypeError)
+  end
+
+  it "return value of #to_s must be a string" do
+    lambda {
+      if TheMindKillerDuce.send(:method_defined?, :to_json)
+        TheMindKillerDuce.send(:undef_method, :to_json)
+      end
+      Yajl::Encoder.encode(TheMindKillerDuce.new)
+    }.should raise_error(TypeError)
   end
 end

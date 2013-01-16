@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0 (November 9th, 2011)
+* fix compilation due to a "bug" in gcc-llvm on 10.7.2
+* fix gemspec so ruby 1.8.6 or later is required
+*
+
+## 1.0.0 (September 13th, 2011)
+* add deprecation notice for Yajl's Bzip2 support
+* add deprecation notice for Yajl's Deflate support
+* add deprecation notice for Yajl's Gzip support
+* add deprecation notice for Yajl's JSON gem compatibility API
+* add deprecation notice for Yajl::HttpStream
+* change the path the extension is copied into to be 'lib/yajl'
+* remove 'ext' from the loadpath
+
+## 0.8.3 (August 16th, 2011)
+* fix bug where Yajl::HttpStream wouldn't pass through a user-specified socket
+* fix incorrect Ruby initialization hook method name
+* Bump bundled YAJL version to 1.0.12
+* fix to correctly symbolize multibyte characters on 1.9
+* add `:headers` option to Yajl::HttpStream for user-specified arbitrary headers
+
 ## 0.8.2 (March 22nd, 2011)
 * define RSTRING_NOT_MODIFIED for rbx to prevent string caching, making things A LOT faster (100x)
 
